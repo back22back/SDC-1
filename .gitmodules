@@ -1,0 +1,3 @@
+[submodule "PegasusShopFront"]
+	path = PegasusShopFront
+	url = ./PegasusShopFront
