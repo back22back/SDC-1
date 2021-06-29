@@ -1,3 +1,4 @@
+require('newrelic');
 const express = require('express');
 const morgan = require('morgan');
 const db = require('../db/queries.js');
@@ -13,8 +14,8 @@ app.get('/products', async (req, res) => {
   const count = req.query.count || 5;
   const client = await db.connect();
   const productsPromise = await db.query(`select * from products order by id offset ${page * count} rows fetch next ${count} rows only`);
-  res.send(productsPromise.rows);
   client.release();
+  res.send(productsPromise.rows);
 });
 
 app.get('/products/:product_id', async (req, res) => {
@@ -41,8 +42,8 @@ app.get('/products/:product_id', async (req, res) => {
     console.log(e.stack);
     res.sendStatus(404);
   } finally {
-    res.send(product);
     client.release();
+    res.send(product);
   }
 });
 
@@ -93,11 +94,11 @@ app.get('/products/:product_id/styles', async (req, res) => {
     from products p
     where id = ${req.params.product_id}`);
     styles = stylesPromise.rows[0];
-    res.send(styles);
   } catch (e) {
     console.log(e.stack);
   } finally {
     client.release();
+    res.send(styles);
   }
 });
 
@@ -114,8 +115,8 @@ app.get('/products/:product_id/related', async (req, res) => {
     console.log(e.stack);
     res.sendStatus(404);
   } finally {
-    res.send(related);
     client.release();
+    res.send(related);
   }
 });
 
