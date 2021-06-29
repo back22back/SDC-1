@@ -1,16 +1,25 @@
-const { Pool } = require('pg');
+const pgp = require('pg-promise')({});
 
-const pool = new Pool({
+const db = pgp({
   user: 'postgres',
-  // host: '/tmp',
+  host: '/tmp',
   database:'postgres',
   password: 'railforce515',
   port: 5432
 });
+// const { Pool } = require('pg');
 
-pool.on('error', (err, client) => {
-  console.error('Unexpected error on idle client', err)
-  process.exit(-1)
-});
+// const pool = new Pool({
+//   user: 'postgres',
+//   host: '/tmp',
+//   database:'postgres',
+//   password: 'railforce515',
+//   port: 5432
+// });
 
-module.exports = pool;
+// pool.on('error', (err, client) => {
+//   console.error('Unexpected error on idle client', err)
+//   process.exit(-1)
+// });
+
+module.exports = db;
