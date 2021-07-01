@@ -1,11 +1,11 @@
 const pgp = require('pg-promise')({});
 
 const db = pgp({
-  user: 'postgres',
-  host: '/tmp',
+  user: 'ubuntu',
+  host: 'ec2-35-167-34-39.us-west-2.compute.amazonaws.com',
   database:'postgres',
-  password: 'railforce515',
-  port: 5432
+  password: 'password',
+  port: 3000
 });
 // const { Pool } = require('pg');
 
