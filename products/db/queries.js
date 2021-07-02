@@ -1,8 +1,8 @@
 const pgp = require('pg-promise')({});
 
 const db = pgp({
-  user: 'ubuntu',
-  host: 'ec2-35-167-34-39.us-west-2.compute.amazonaws.com',
+  user: 'postgres',
+  host: 'ec2-54-185-197-90.us-west-2.compute.amazonaws.com',
   database:'postgres',
   password: 'password',
   port: 3000

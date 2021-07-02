@@ -1,10 +1,9 @@
 node_modules
 npm-debug.log
-features.csv
-photos.csv
-product.csv
-related.csv
-skus.csv
-styles.csv
-newrelic.js
-db
+/products/db/features.csv
+/products/db/photos.csv
+/products/db/product.csv
+/products/db/related.csv
+/products/db/skus.csv
+/products/db/styles.csv
+/products/server/newrelic.js
