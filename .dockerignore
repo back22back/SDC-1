@@ -6,4 +6,3 @@ npm-debug.log
 /products/db/related.csv
 /products/db/skus.csv
 /products/db/styles.csv
-/products/server/newrelic.js
