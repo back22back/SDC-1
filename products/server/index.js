@@ -1,3 +1,4 @@
+require('newrelic');
 const express = require('express');
 const morgan = require('morgan');
 const db = require('../db/queries.js');
@@ -11,17 +12,18 @@ app.use(morgan('dev'));
 app.get('/products', async (req, res) => {
   const page = req.query.page || 0;
   const count = req.query.count || 5;
-  const client = await db.connect();
-  const productsPromise = await db.query(`select * from products order by id offset ${page * count} rows fetch next ${count} rows only`);
-  res.send(productsPromise.rows);
-  client.release();
+  try {
+    const productsPromise = await db.any(`select * from products order by id offset ${page * count} rows fetch next ${count} rows only`);
+    res.send(productsPromise);
+  } catch (e) {
+    console.log(e.stack);
+    res.sendStatus(404);
+  }
 });
 
 app.get('/products/:product_id', async (req, res) => {
-  const client = await db.connect();
-  let product;
   try {
-    const productPromise = await client.query(`
+    const productPromise = await db.any(`
     select
     *,
     coalesce(
@@ -36,21 +38,16 @@ app.get('/products/:product_id', async (req, res) => {
     ) as features
     from products p
     where id = ${req.params.product_id}`);
-    product = productPromise.rows[0];
+    res.send(productPromise[0]);
   } catch (e) {
     console.log(e.stack);
     res.sendStatus(404);
-  } finally {
-    res.send(product);
-    client.release();
   }
 });
 
 app.get('/products/:product_id/styles', async (req, res) => {
-  const client = await db.connect();
-  let styles;
   try {
-    const stylesPromise = await client.query(
+    const stylesPromise = await db.any(
     `select
     id as product_id,
     (select
@@ -92,50 +89,25 @@ app.get('/products/:product_id/styles', async (req, res) => {
     ) as results
     from products p
     where id = ${req.params.product_id}`);
-    styles = stylesPromise.rows[0];
-    res.send(styles);
+    res.send(stylesPromise[0]);
   } catch (e) {
     console.log(e.stack);
-  } finally {
-    client.release();
+    res.sendStatus(404);
   }
 });
 
 app.get('/products/:product_id/related', async (req, res) => {
-  const client = await db.connect();
-  let related;
   try {
-    const relatedPromise = await client.query(`
+    const relatedPromise = await db.any(`
     select array_agg (related_id) related
     from related
     where product_id = ${req.params.product_id}`);
-    related = relatedPromise.rows[0].related;
+    res.send(relatedPromise[0].related)
   } catch (e) {
     console.log(e.stack);
     res.sendStatus(404);
-  } finally {
-    res.send(related);
-    client.release();
   }
 });
-
-// app.get('/products/:product_id/related', async (req, res) => {
-//   const client = db.connect((err, client, release) => {
-//     if (err) {
-//       return console.err(err.stack);
-//     }
-//     client.query(`
-//     select array_agg (related_id) related
-//     from related
-//     where product_id = ${req.params.product_id}`, (err, result) => {
-//       release();
-//       if (err) {
-//         return console.err(err.stack);
-//       }
-//       res.send(result.rows[0].related);
-//     });
-//   });
-// });
 
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);
